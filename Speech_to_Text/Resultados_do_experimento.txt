@@ -1,0 +1,55 @@
+Relatório Experimental: Comparação de Modelos Whisper para Transcrição de Áudio
+1. Introdução
+O objetivo deste experimento foi avaliar e comparar o desempenho de três implementações distintas do modelo Whisper de transcrição de áudio, com foco na velocidade de inferência e precisão das transcrições. As implementações avaliadas foram:
+
+OpenAI Whisper: Modelo original desenvolvido pela OpenAI, sem otimizações específicas.
+Faster Whisper: Implementação otimizada com ONNX Runtime e FP16 (half-precision) para melhor desempenho.
+WhisperX: Extensão do Whisper que adiciona detecção de atividade de voz (VAD) e alinhamento temporal para áudios longos.
+Foram utilizados três arquivos de áudio (Teste1, Teste2, Teste3) e comparados os resultados transcritos com o gabarito de referência.
+
+2. Metodologia
+Procedimento Experimental
+Áudios de Entrada: Foram utilizados três arquivos de áudio representando cenários reais de transcrição de entregas:
+
+Teste1: "Opa, entrega aqui no 81 Taquaral, pra dona Denilce".
+Teste2: "Boa noite, Ifood, 81 Taquaral".
+Teste3: "Boa noite, tenho uma entrega pro 81 Taquaral, Ifood".
+Inferência: Os áudios foram transcritos utilizando os três modelos, em sequência, no mesmo ambiente.
+
+Métricas Avaliadas:
+
+Tempo de Inferência: Medido em segundos.
+Precisão: Comparação qualitativa com o gabarito fornecido.
+Resultados Armazenados: Todas as saídas foram capturadas e comparadas ao final do experimento.
+
+3. Resultados
+3.1 Resultados de Transcrição
+Modelo	Teste 1	Teste 2	Teste 3
+Gabarito	"Opa, entrega aqui no 81 Taquaral, pra dona Denilce"	"Boa noite, Ifood, 81 Taquaral"	"Boa noite, tenho uma entrega pro 81 Taquaral, Ifood"
+OpenAI Whisper	"Opa, entrega aqui no 81 Taquarao, pra dona de Nilce"	"Boa noite, iFood 81 Taquarao"	"Boa noite, tenho uma entrega pro 81 Taquaraú Vai fudir!"
+Faster Whisper	"Opa, entrega aqui no 81 Taquaral, pra dona de Nilce"	"Boa noite, iFood, 81 Taquarao"	"Boa noite, tenho uma entrega pro 81 Taquaral, vai fudir"
+WhisperX	"Opa, entrega aqui no 81 Taquaral pra Dona Denise"	"Boa noite, iFood 81 Taquaral?"	"Boa noite, tenho uma entrega pro 81 Taquarau. Vai, fude."
+3.2 Tempo de Inferência
+Modelo	Teste 1	Teste 2	Teste 3	Média
+OpenAI Whisper	7.75 s	6.12 s	6.89 s	6.92 s
+Faster Whisper	2.41 s	2.16 s	2.32 s	2.30 s
+WhisperX	2.45 s	2.26 s	2.43 s	2.38 s
+4. Discussão
+4.1 Precisão da Transcrição
+OpenAI Whisper: Apresentou erros frequentes em nomes próprios ("Denilce" → "de Nilce") e interpretou palavras incorretamente em situações de pronúncia ambígua, como "Vai fudir!" em vez de "Ifood".
+Faster Whisper: Demonstrou maior consistência e precisão, com transcrições muito próximas ao gabarito em todos os testes.
+WhisperX: Apesar de rápido, introduziu erros em nomes próprios ("Dona Denise") e apresentou pontuações incorretas ("Taquaral?"), o que pode afetar a confiabilidade em cenários de aplicação sensível.
+4.2 Desempenho (Tempo de Inferência)
+O Faster Whisper foi 3x mais rápido que o OpenAI Whisper, mantendo uma precisão superior.
+O WhisperX, embora próximo em tempo ao Faster Whisper, mostrou desempenho inferior em precisão.
+4.3 Justificativa para o Uso do Faster Whisper
+Com base nos resultados experimentais, o Faster Whisper foi o modelo mais eficiente para o caso de uso apresentado, devido a:
+
+Alta Precisão: Resultados mais próximos do gabarito em comparação com as outras implementações.
+Velocidade Superior: Tempo de inferência consistentemente baixo (~2.3 segundos em média).
+Eficiência Computacional: Utiliza FP16 (half-precision) e ONNX Runtime, otimizando o uso de recursos da GPU.
+Essas características tornam o Faster Whisper ideal para aplicações em tempo real ou com alta demanda de desempenho, sem comprometer a precisão da transcrição.
+
+5. Conclusão
+O experimento comparativo entre as implementações do Whisper demonstrou que o Faster Whisper oferece o melhor compromisso entre precisão e velocidade de inferência. Portanto, ele é recomendado como solução principal para transcrição de áudio em português em aplicações que demandam alta performance.
+
