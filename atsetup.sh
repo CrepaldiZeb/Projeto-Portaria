@@ -62,49 +62,229 @@ else
     echo "Continue with the main menu."
 fi
 
-# Directly execute standalone installation
-echo
-echo -e "    ${L_BLUE}ALLTALK STANDALONE APPLICATION SETUP${NC}"
-echo
-echo "    Executing Standalone Application installation..."
-install_custom_standalone
-exit 0
+# Main Menu
+main_menu() {
+    while true; do
+        clear
+        echo
+        echo -e "    ${L_BLUE}ALLTALK LINUX SETUP UTILITY${NC}"
+        echo
+        echo "    INSTALLATION TYPE"
+        echo -e "    1) I am using AllTalk as part of ${L_GREEN}Text-generation-webui${NC}"
+        echo -e "    2) I am using AllTalk as a ${L_GREEN}Standalone Application${NC}"
+        echo
+        echo -e "    9)${L_RED} Exit/Quit${NC}"
+        echo  
+        
+        # Chama o standalone_menu diretamente sem pedir entrada
+        standalone_menu
+        break # Encerra o loop após o standalone_menu ser executado
+    done
+}
 
-# Standalone Menu (para funcionalidades adicionais)
-# standalone_menu() {
-#    while true; do
-#       clear
-#        echo
-#        echo -e "    ${L_BLUE}ALLTALK STANDALONE APPLICATION SETUP${NC}"
-#        echo
-#        echo "    BASE REQUIREMENTS"
-#        echo "    1) Install AllTalk as a Standalone Application"
-#        echo
-#        echo "    OPTIONAL"
-#        echo "    2) Git Pull the latest AllTalk updates from Github"
-#        echo "    3) Re-Apply/Update the requirements file"
-#        echo "    4) Delete AllTalk's custom Python environment"
-#        echo "    5) Purge the PIP cache"
-#        echo
-#        echo "    OTHER"        
-#        echo "    8) Generate a diagnostics file"
-#        echo
-#        echo -e "    9)${L_RED} Exit/Quit${NC}"
-#        echo
-#        read -p "    Enter your choice: " standalone_option
-#
-#        case $standalone_option in
-#            1) install_custom_standalone ;;
-#            2) gitpull_standalone ;;
-#            3) reapply_standalone ;;
-#            4) delete_custom_standalone ;;
-#            5) pippurge_standalone ;;
-#            8) generate_diagnostics_standalone ;;
-#            9) exit 0 ;;
-#            *) echo "Invalid option"; sleep 2 ;;
-#        esac
-#    done
-#}
+# Text-generation-webui Menu
+webui_menu() {
+    while true; do
+        clear
+        echo
+        echo -e "    ${L_BLUE}TEXT-GENERATION-WEBUI SETUP${NC}"
+        echo
+        echo -e "    Please ensure you have started your Text-generation-webui Python"
+        echo -e "    environment. If you have NOT done this, please run ${L_GREEN}/cmd_linux.sh${NC}"
+        echo -e "    in the ${L_GREEN}text-generation-webui${NC} folder and then re-run this script."
+        echo
+        echo "    BASE REQUIREMENTS"
+        echo -e "    1) Apply/Re-Apply the requirements for an ${L_GREEN}Text-generation-webui${NC}"
+        echo
+        echo "    OPTIONAL"
+        echo "    2) Git Pull the latest AllTalk updates from Github"
+        echo
+        echo "    DEEPSPEED"
+        echo "    4) Install DeepSpeed."
+        echo "    5) Uninstall DeepSpeed."
+        echo
+        echo "    OTHER"
+        echo "    6) Generate a diagnostics file."
+        echo
+        echo -e "    9)${L_RED} Exit/Quit${NC}"
+        echo
+        read -p "    Enter your choice: " webui_option
+
+        case $webui_option in
+            1) install_nvidia_textgen ;;
+            2) tg_gitpull ;;
+            4) install_deepspeed ;;
+            5) uninstall_deepspeed ;;
+            6) generate_diagnostics_textgen ;;
+            9) exit 0 ;;
+            *) echo "Invalid option"; sleep 2 ;;
+        esac
+    done
+}
+
+install_nvidia_textgen() {
+    local requirements_file="system/requirements/requirements_textgen.txt"
+    echo "    Installing Requirements from $requirements_file..."
+    if ! pip install -r "$requirements_file"; then
+        echo
+        echo "    There was an error pulling from Github."
+        echo "    Please check the output for details."
+        read -p "    Press any key to return to the menu. " -n 1
+        echo
+        return
+    fi
+    echo
+    echo "    Requirements installed successfully."
+    
+    echo "    Installing additional requirements..."
+    if ! pip install -r system/requirements/requirements_textgen2.txt; then
+        echo
+        echo "    There was an error installing additional requirements."
+        echo "    Please check the output for details."
+        read -p "    Press any key to return to the menu. " -n 1
+        echo
+        return
+    fi
+
+    if ! conda install -y pytorch::faiss-cpu; then
+        echo
+        echo "    There was an error installing faiss-cpu."
+        echo "    Please check the output for details."
+        read -p "    Press any key to return to the menu. " -n 1
+        echo
+        return
+    fi
+
+    if ! conda install -y conda-forge::ffmpeg; then
+        echo
+        echo "    There was an error installing ffmpeg."
+        echo "    Please check the output for details."
+        read -p "    Press any key to return to the menu. " -n 1
+        echo
+        return
+    fi
+
+    echo
+    echo "    Additional requirements installed successfully."
+    echo
+    echo -e "    To install ${L_YELLOW}DeepSpeed${NC} on Linux, there are additional"
+    echo -e "    steps required. Please see the Github or documentation on DeepSeed."
+    echo
+    read -p "    Press any key to continue. " -n 1
+    echo
+}
+
+
+tg_gitpull() {
+    echo
+    if ! git pull; then
+        echo
+        echo "    There was an error installing the requirements."
+        echo "    Please check the output for details."
+        echo
+        read -p "    Press any key to return to the menu. " -n 1
+        echo
+        return
+    fi
+    echo
+    echo "    AllTalk Updated from Github. Please re-apply"
+    echo "    the latest requirements file. (Option 1)"
+    echo
+    read -p "    Press any key to continue. " -n 1
+    echo
+}
+
+# Function to install DeepSpeed
+install_deepspeed() {
+    clear
+    echo
+    echo -e "    ${L_BLUE}DEEPSPEED INSTALLATION REQUIREMENTS${NC}"
+    echo
+    echo -e "    - Please go see this link as the instructions are there.${NC}"
+    echo -e "    The instructions there are making it as simple as posisble.${NC}"
+    echo -e "      ${L_GREEN}https://github.com/erew123/alltalk_tts/releases/tag/DeepSpeed-14.2-Linux${NC}"
+    echo
+    read -p "    Have you completed all the above steps? (y/n): " confirm
+
+    if [ "$confirm" != "y" ]; then
+        echo -e "    ${RED}DeepSpeed installation cannot proceed without completing the prerequisites.${NC}"
+        return
+    fi
+
+    echo -e "\n    ${GREEN}Proceeding with DeepSpeed installation...${NC}"
+
+    if [ $? -ne 0 ]; then
+        echo -e "    ${RED}There was an error installing DeepSpeed.${NC}"
+        return
+    fi
+
+    echo -e "    ${GREEN}DeepSpeed installed successfully.${NC}"
+    read -p "    Press any key to continue. " -n 1
+    echo
+}
+
+uninstall_deepspeed() {
+    echo "Uninstalling DeepSpeed..."
+    pip uninstall -y deepspeed
+    if [ $? -ne 0 ]; then
+        echo
+        echo "    There was an error uninstalling DeepSpeed."
+        echo
+        echo "    Press any key to return to the menu."
+        read -n 1
+        return
+    fi
+    echo
+    echo "    DeepSpeed uninstalled successfully."
+    echo
+    echo "    Press any key to continue."
+    read -n 1
+}
+
+generate_diagnostics_textgen() {
+    # Run diagnostics
+    if ! python diagnostics.py; then
+        echo
+        echo "    There was an error running diagnostics."
+        echo
+        read -p "    Press any key to return to the menu. " -n 1
+        echo
+        return
+    fi
+    echo
+    echo "    Diagnostics log file generated successfully."
+    echo "    Please see diagnostics.log"
+    echo
+    read -p "    Press any key to continue. " -n 1
+    echo
+}
+
+standalone_menu() {
+    while true; do
+        clear
+        echo
+        echo -e "    ${L_BLUE}ALLTALK STANDALONE APPLICATION SETUP${NC}"
+        echo
+        echo "    BASE REQUIREMENTS"
+        echo "    1) Install AllTalk as a Standalone Application"
+        echo
+        echo "    OPTIONAL"
+        echo "    2) Git Pull the latest AllTalk updates from Github"
+        echo "    3) Re-Apply/Update the requirements file"
+        echo "    4) Delete AllTalk's custom Python environment"
+        echo "    5) Purge the PIP cache"
+        echo
+        echo "    OTHER"        
+        echo "    8) Generate a diagnostics file"
+        echo
+        echo -e "    9)${L_RED} Exit/Quit${NC}"
+        echo
+        
+        install_custom_standalone # Chama a função desejada
+        
+        break # Encerra o loop
+    done
+}
 
 
 install_custom_standalone() {
@@ -171,7 +351,7 @@ install_custom_standalone() {
     rm deepspeed-0.14.2+cu121torch2.2-cp311-cp311-manylinux_2_24_x86_64.whl
     pip install -r system/requirements/requirements_parler.txt
     conda clean --all --force-pkgs-dirs -y
-    # Create start_environment.sh to run AllTalk
+    Create start_environment.sh to run AllTalk
     cat << EOF > start_environment.sh
 #!/bin/bash
 cd "$(dirname "${BASH_SOURCE[0]}")"
@@ -361,5 +541,5 @@ reapply_standalone() {
 }
 
 
-# Execute a função de instalação standalone
-# main_menu
+# Start the main menu
+main_menu
