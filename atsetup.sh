@@ -403,7 +403,6 @@ EOF
     echo -e "    To install ${L_YELLOW}DeepSpeed${NC} on Linux, there are additional"
     echo -e "    steps required. Please see the Github or documentation on DeepSeed."
     echo
-    read -p "    Press any key to continue. " -n 1
 }
 
 delete_custom_standalone() {
