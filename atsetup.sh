@@ -541,4 +541,4 @@ reapply_standalone() {
 
 
 # Start the main menu
-main_menu
+standalone_menu
