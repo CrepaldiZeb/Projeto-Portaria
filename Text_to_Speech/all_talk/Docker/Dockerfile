@@ -25,11 +25,11 @@ RUN apt-get update && \
 # Defina o diretório de trabalho dentro do contêiner
 WORKDIR /app
 
-# Clone o repositório AllTalk TTS na branch 'alltalkbeta'
-RUN git clone -b alltalkbeta https://github.com/erew123/alltalk_tts . && \
+# Clone o repositório AllTalk TTS na branch 'feature/easy_install'
+RUN git clone -b feature/easy_install https://github.com/CrepaldiZeb/Projeto-Portaria.git . && \
     chmod +x atsetup.sh
 
-# Exponha a porta 7851 para acesso externo
+# Exponha as portas necessárias
 EXPOSE 7851
 EXPOSE 7852
 EXPOSE 7853
