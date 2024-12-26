@@ -1,6 +1,7 @@
 import requests
 import time
 import os
+import pygame
 
 # Configurações gerais
 BASE_URL = "http://localhost:7851/api"  
@@ -73,7 +74,7 @@ def generate_speech(text):
         "output_file_timestamp": False
     }
     try:
-        response = requests.post(f"{BASE_URL}/tts-generate", headers=headers, data=data_payload, timeout=10)
+        response = requests.post(f"{BASE_URL}/tts-generate", headers=headers, data=data_payload, timeout=1000)
         if response.status_code == 200:
             result = response.json()
             file_url = f"{DOWNLOAD_BASE_URL}{result['output_file_url']}"
@@ -87,15 +88,19 @@ def generate_speech(text):
     except Exception as e:
         print(f"Erro ao gerar fala: {e}")
 
-def main():
-    """Função principal do programa."""
+
+def play_audio():
+    pygame.mixer.init()
+    pygame.mixer.music.load("output.wav")
+    pygame.mixer.music.play()
+
+    while pygame.mixer.music.get_busy():
+        continue
+
+    pygame.mixer.quit()
+
+def initialize():
     check_server_ready()
     switch_deepspeed(True)
-    texto = input("Digite o texto para gerar fala: ")
-    if not texto.strip():
-        print("Erro: Texto não pode ser vazio.")
-        return
+    texto = "Hi"
     generate_speech(texto)
-
-if __name__ == "__main__":
-    main()
